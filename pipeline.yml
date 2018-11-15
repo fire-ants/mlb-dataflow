@@ -1,0 +1,72 @@
+resources:
+- name: mlb-dataflow
+  type: git
+  source:
+    uri: git@github.com:fire-ants/mlb-dataflow.git
+    branch: ((git-branch))
+    private_key: ((git-private-key))
+- name: mlb-datafresh
+  type: git
+  source:
+    uri: git@github.com:fire-ants/mlb-analytics-ant-datafresh.git
+    branch: ((git-branch))
+    private_key: ((git-private-key))
+- name: mlb-ml-repo
+  type: git
+  source:
+    uri: git@github.com:fire-ants/mlb-machine-learning.git
+    branch: ((git-branch))
+    private_key: ((git-private-key)
+- name: mlb-analytics-ant
+  type: git
+  source:
+    uri: git@github.com:fire-ants/mlb-analytics-ant.git
+    branch: ((git-branch))
+    private_key: ((git-private-key)
+jobs:
+- name: execute_task_datafresh
+  plan:
+  - get: mlb-dataflow
+  - get: mlb-datafresh
+    resource: mlb-datafresh
+  - task: execute_datafresh
+    file: mlb-datafresh/ci/tasks/run_datafresh.yml
+    params:
+      CF_USER: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      CF_ORG: ((cf-org))
+      CF_SPACE: ((cf-space))
+- name: execute_machine_learning
+  plan:
+  - get: mlb-dataflow
+    passed: [execute_task_datafresh]
+  - get: mlb-ml-repo
+    resource: mlb-ml-repo
+  - task: execute_machine_learning
+    file: mlb-ml-repo/ci/tasks/run_machine_learning.yml
+    params:
+      CF_USER: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      CF_ORG: ((cf-org))
+      CF_SPACE: ((cf-space))
+- name: execute_analytics_ant
+  plan:
+  - get: mlb-dataflow
+    passed: [execute_task_datafresh]
+  - get: mlb-analytics-ant
+    resource: mlb-analytics-ant
+  - task: execute_analytics_ant
+    file: mlb-analytics-ant/ci/tasks/run_analytics.yml
+    params:
+      CF_USER: ((cf-username))
+      CF_PASSWORD: ((cf-password))
+      CF_ORG: ((cf-org))
+      CF_SPACE: ((cf-space))
+
+  #  trigger: true
+    #on_success:
+    #  - aggregate:
+    #    - task: run-machine-learning
+    #      config:
+    #    - task: run-analytics-ant
+    #      file:
