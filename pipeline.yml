@@ -40,6 +40,7 @@ jobs:
   plan:
   - get: mlb-dataflow
     passed: [execute_task_datafresh]
+    trigger: true
   - get: mlb-ml-repo
     resource: mlb-ml-repo
   - task: execute_machine_learning
@@ -53,6 +54,7 @@ jobs:
   plan:
   - get: mlb-dataflow
     passed: [execute_task_datafresh]
+    trigger: true
   - get: mlb-analytics-ant
     resource: mlb-analytics-ant
   - task: execute_analytics_ant
@@ -62,11 +64,3 @@ jobs:
       CF_PASSWORD: ((cf-password))
       CF_ORG: ((cf-org))
       CF_SPACE: ((cf-space))
-
-  #  trigger: true
-    #on_success:
-    #  - aggregate:
-    #    - task: run-machine-learning
-    #      config:
-    #    - task: run-analytics-ant
-    #      file:
