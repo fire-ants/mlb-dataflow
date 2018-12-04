@@ -16,13 +16,20 @@ resources:
   source:
     uri: git@github.com:fire-ants/mlb-machine-learning.git
     branch: ((git-branch))
-    private_key: ((git-private-key)
+    private_key: ((git-private-key))
 - name: mlb-analytics-ant
   type: git
   source:
     uri: git@github.com:fire-ants/mlb-analytics-ant.git
     branch: ((git-branch))
-    private_key: ((git-private-key)
+    private_key: ((git-private-key))
+- name: schedule
+  type: time
+  source:
+    interval: 10m
+    start: "12:00 AM"
+    stop: "11:59 PM"
+  
 jobs:
 - name: execute_task_datafresh
   plan:
